@@ -299,8 +299,20 @@ async (conn, m, mek, { from, q, reply, creator, backup, msr }) => {
     } else {
         await reply(notFoundMg);
     }
+
+}
+}
+}
+}
 } catch (e) {
-    console.log(e);
-    const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mekOpt });
+    console.log(e)
+    const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mek });
     await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
 }
+});
+} catch (e) {
+    console.log(e)
+    const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mek });
+    await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
+}
+});
