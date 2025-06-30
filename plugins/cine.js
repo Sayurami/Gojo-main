@@ -300,10 +300,7 @@ async (conn, m, mek, { from, q, reply, creator, backup, msr }) => {
         await reply(notFoundMg);
     }
 
-}
-}
-}
-}
+
 } catch (e) {
     console.log(e)
     const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mek });
