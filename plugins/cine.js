@@ -301,16 +301,28 @@ async (conn, m, mek, { from, q, reply, creator, backup, msr }) => {
     }
 
 
+//=============== (Previous code same remain) ======================
+
+// Inside if (selectedQuality >= 0 && movieData?.downloadUrl?.length > 0 && selectedQuality < movieData.downloadUrl.length)
 } catch (e) {
     console.log(e);
     const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mek });
     await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
 }
-} // if (isReplyToSentMsg) close
-}); // conn.ev.on('messages.upsert', ...) close
+} // selectedQuality condition close
+} // isReplyToOptionsMsg close
+}); // conn.ev.on('messages.upsert' for option select) close
+} // selectedEpIndex condition close
 } catch (e) {
     console.log(e);
     const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mek });
     await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
 }
-}); // cmd({}) close
+} // isReplyToSentMsg close
+}); // conn.ev.on('messages.upsert' for main search select) close
+} catch (e) {
+    console.log(e);
+    const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mek });
+    await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
+}
+}); // cmd({}) final close
