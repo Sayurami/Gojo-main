@@ -302,14 +302,15 @@ async (conn, m, mek, { from, q, reply, creator, backup, msr }) => {
 
 
 } catch (e) {
-    console.log(e)
+    console.log(e);
     const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mek });
     await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
 }
-});
+} // if (isReplyToSentMsg) close
+}); // conn.ev.on('messages.upsert', ...) close
 } catch (e) {
-    console.log(e)
+    console.log(e);
     const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mek });
     await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
 }
-});
+}); // cmd({}) close
