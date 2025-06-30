@@ -263,68 +263,44 @@ async (conn, m, mek, { from, q, reply, creator, backup, msr }) => {
                                      const selectedQ = movieData.downloadUrl[selectedQuality];
                                      var size = selectedQ.size;
                             
-                                try{
+                            try {
+    await conn.sendMessage(fromOpt, { react: { text: '⬇', key: mekOpt.key } });
 
-                                    await conn.sendMessage(fromOpt, { react: { text: '⬇', key: mekOpt.key } });
-
-                                    size = parseFloat(size.replace('GB', '').replace('MB', ''));
-                                    if (!isNaN(size)) {
-                                    if (selectedQ.size.includes('GB') && size >= config.MAX_SIZE_GB) {
-                                    return reply(`*The file is too large to download ⛔*\n\n` +
-                                    `🔹 Your current *MAX_SIZE_GB* limit: *${config.MAX_SIZE_GB}GB* 📏\n` +
-                                    `🔹 To change this limit, use the *${prefix}apply* command.`);
-                                     }
-                                    if (selectedQ.size.includes('MB') && size >= config.MAX_SIZE) {
-                                    return reply(`*The file is too large to download ⛔*\n\n` +
-                                    `🔹 Your current *MAX_SIZE* limit: *${config.MAX_SIZE}MB* 📏\n` +
-                                    `🔹 To change this limit, use the *${prefix}apply* command.`);
-                                    }}
-                                    
-                        
-                                    const anu = await (await fetch(`${baseUrl}/api/movie/cinesubz/download?url=${selectedQ.link}&apikey=${apiKey}`)).json(); 
-
-                                    if (!anu?.data?.download) {
-                                    const error = await conn.sendMessage(from, { text: notFoundMg }, { quoted: mek })
-                                    await conn.sendMessage(from, { react: { text: errorReact, key: error.key } });
-                                    return
-                                     }
-                          
-                                    if (anu.data.download.gdrive || anu.data.download.gdrive2) {
-                                    await uploadFile(anu.data.download.gdrive || anu.data.download.gdrive2, "gdrive", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
-                                    } else if (anu?.data?.download?.direct) 
-                                    {
-                                        await
-                                    uploadFile(anu.data.download.direct, "direct", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
-}
-                                     else {
-                                    await reply(notFoundMg);
-                                    }
-                        
-                                } catch(e) {
-                                        console.log(e)
-                                        const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mekOpt });
-                                        await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
-                                }
-                              
-                            } else {
-                                await reply(invalidReply);
-                            }
-                        }
-                    });
-                  } else {
-                    await reply(invalidReply);
-                }
-                     
-            } catch (e) {
-                  console.log(e)
-                  const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mekInfo });
-                  await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
-            }}
-        });
-
-    } catch (e) {
-    console.log(e)
-    const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mek });
-    await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
+    size = parseFloat(size.replace('GB', '').replace('MB', ''));
+    if (!isNaN(size)) {
+        if (selectedQ.size.includes('GB') && size >= config.MAX_SIZE_GB) {
+            return reply(`*The file is too large to download ⛔*\n\n` +
+                `🔹 Your current *MAX_SIZE_GB* limit: *${config.MAX_SIZE_GB}GB* 📏\n` +
+                `🔹 To change this limit, use the *${prefix}apply* command.`);
+        }
+        if (selectedQ.size.includes('MB') && size >= config.MAX_SIZE) {
+            return reply(`*The file is too large to download ⛔*\n\n` +
+                `🔹 Your current *MAX_SIZE* limit: *${config.MAX_SIZE}MB* 📏\n` +
+                `🔹 To change this limit, use the *${prefix}apply* command.`);
+        }
     }
-});
+
+    const anu = await (await fetch(`${baseUrl}/api/movie/cinesubz/download?url=${selectedQ.link}&apikey=${apiKey}`)).json();
+
+    if (!anu?.data?.download) {
+        const error = await conn.sendMessage(from, { text: notFoundMg }, { quoted: mek });
+        await conn.sendMessage(from, { react: { text: errorReact, key: error.key } });
+        return;
+    }
+
+    const dl = anu.data.download;
+
+    if (dl.gdrive || dl.gdrive2) {
+        await uploadFile(dl.gdrive || dl.gdrive2, "gdrive", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
+    } else if (dl.direct) {
+        await uploadFile(dl.direct, "direct", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
+    } else if (dl.mega) {
+        await uploadFile(dl.mega, "mega", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
+    } else {
+        await reply(notFoundMg);
+    }
+} catch (e) {
+    console.log(e);
+    const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mekOpt });
+    await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
+}
