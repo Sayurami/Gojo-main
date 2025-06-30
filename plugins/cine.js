@@ -291,11 +291,12 @@ async (conn, m, mek, { from, q, reply, creator, backup, msr }) => {
                           
                                     if (anu.data.download.gdrive || anu.data.download.gdrive2) {
                                     await uploadFile(anu.data.download.gdrive || anu.data.download.gdrive2, "gdrive", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
-                                    } else if (anu.response.direct) {
-                                    await uploadFile(anu.data.download.direct, "direct", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
-                                    } else if (anu.response.mega) {
-                                    await uploadFile(anu.data.download.mega, "mega", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
-                                    } else {
+                                    } else if (anu?.data?.download?.direct) 
+                                    {
+                                        await
+                                    uploadFile(anu.data.download.direct, "direct", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
+}
+                                     else {
                                     await reply(notFoundMg);
                                     }
                         
