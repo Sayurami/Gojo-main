@@ -254,7 +254,11 @@ async (conn, m, mek, { from, q, reply, creator, backup, msr }) => {
                                  }
                                 
                                 // D O W N L O A D
-                             } else if(selectedQuality >= 0 && selectedQuality < movieData.dl_links.length) {
+                             } else if (
+    selectedQuality >= 0 &&
+    movieData?.downloadUrl?.length > 0 &&
+    selectedQuality < movieData.downloadUrl.length
+) {
                                 
                                      const selectedQ = movieData.downloadUrl[selectedQuality];
                                      var size = selectedQ.size;
@@ -265,12 +269,12 @@ async (conn, m, mek, { from, q, reply, creator, backup, msr }) => {
 
                                     size = parseFloat(size.replace('GB', '').replace('MB', ''));
                                     if (!isNaN(size)) {
-                                    if (q.includes('GB') && size >= config.MAX_SIZE_GB) {
+                                    if (selectedQ.size.includes('GB') && size >= config.MAX_SIZE_GB) {
                                     return reply(`*The file is too large to download ⛔*\n\n` +
                                     `🔹 Your current *MAX_SIZE_GB* limit: *${config.MAX_SIZE_GB}GB* 📏\n` +
                                     `🔹 To change this limit, use the *${prefix}apply* command.`);
                                      }
-                                    if (q.includes('MB') && size >= config.MAX_SIZE) {
+                                    if (selectedQ.size.includes('MB') && size >= config.MAX_SIZE) {
                                     return reply(`*The file is too large to download ⛔*\n\n` +
                                     `🔹 Your current *MAX_SIZE* limit: *${config.MAX_SIZE}MB* 📏\n` +
                                     `🔹 To change this limit, use the *${prefix}apply* command.`);
@@ -279,7 +283,7 @@ async (conn, m, mek, { from, q, reply, creator, backup, msr }) => {
                         
                                     const anu = await (await fetch(`${baseUrl}/api/movie/cinesubz/download?url=${selectedQ.link}&apikey=${apiKey}`)).json(); 
 
-                                    if (!anu.data) {
+                                    if (!anu?.data?.download) {
                                     const error = await conn.sendMessage(from, { text: notFoundMg }, { quoted: mek })
                                     await conn.sendMessage(from, { react: { text: errorReact, key: error.key } });
                                     return
