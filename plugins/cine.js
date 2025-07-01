@@ -1,7 +1,7 @@
 const axios = require('axios');
 const config = require('../settings')
 const { cmd, commands } = require('../lib/command')
-const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson, fetchApi, getThumbnailFromUrl, resizeThumbnail } = require('../lib/functions')
+const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson } = require('../lib/functions')
 const fg = require('api-dylux');
 
 const oce = "`"
@@ -95,11 +95,11 @@ async function uploadFile(url, type, from, jid, nmf, quality, mek, conn) {
 
 
 cmd({
-    pattern: "cinesubzt_un",
-    alias: ["mv_un","cinet"],
+    pattern: "cinesubzt",
+    alias: ["mv","cine"],
     react: "🎥",
-    desc: "Download movie for cinesubz.co",
-    category: "download_un",
+    desc: "Download movie for cinesubz.lk",
+    category: "download",
     use: 'cinesubz < Movie Name >',
     filename: __filename
 },
@@ -254,75 +254,72 @@ async (conn, m, mek, { from, q, reply, creator, backup, msr }) => {
                                  }
                                 
                                 // D O W N L O A D
-                             } else if (
-    selectedQuality >= 0 &&
-    movieData?.downloadUrl?.length > 0 &&
-    selectedQuality < movieData.downloadUrl.length
-) {
+                             } else if(selectedQuality >= 0 && selectedQuality < movieData.downloadUrl.length) {
                                 
                                      const selectedQ = movieData.downloadUrl[selectedQuality];
                                      var size = selectedQ.size;
                             
-                            try {
-    await conn.sendMessage(fromOpt, { react: { text: '⬇', key: mekOpt.key } });
+                                try{
 
-    size = parseFloat(size.replace('GB', '').replace('MB', ''));
-    if (!isNaN(size)) {
-        if (selectedQ.size.includes('GB') && size >= config.MAX_SIZE_GB) {
-            return reply(`*The file is too large to download ⛔*\n\n` +
-                `🔹 Your current *MAX_SIZE_GB* limit: *${config.MAX_SIZE_GB}GB* 📏\n` +
-                `🔹 To change this limit, use the *${prefix}apply* command.`);
-        }
-        if (selectedQ.size.includes('MB') && size >= config.MAX_SIZE) {
-            return reply(`*The file is too large to download ⛔*\n\n` +
-                `🔹 Your current *MAX_SIZE* limit: *${config.MAX_SIZE}MB* 📏\n` +
-                `🔹 To change this limit, use the *${prefix}apply* command.`);
-        }
-    }
+                                    await conn.sendMessage(fromOpt, { react: { text: '⬇', key: mekOpt.key } });
 
-    const anu = await (await fetch(`${baseUrl}/api/movie/cinesubz/download?url=${selectedQ.link}&apikey=${apiKey}`)).json();
+                                    size = parseFloat(size.replace('GB', '').replace('MB', ''));
+                                    if (!isNaN(size)) {
+                                    if (q.includes('GB') && size >= config.MAX_SIZE_GB) {
+                                    return reply(`*The file is too large to download ⛔*\n\n` +
+                                    `🔹 Your current *MAX_SIZE_GB* limit: *${config.MAX_SIZE_GB}GB* 📏\n` +
+                                    `🔹 To change this limit, use the *${prefix}apply* command.`);
+                                     }
+                                    if (q.includes('MB') && size >= config.MAX_SIZE) {
+                                    return reply(`*The file is too large to download ⛔*\n\n` +
+                                    `🔹 Your current *MAX_SIZE* limit: *${config.MAX_SIZE}MB* 📏\n` +
+                                    `🔹 To change this limit, use the *${prefix}apply* command.`);
+                                    }}
+                                    
+                        
+                                    const anu = await (await fetch(`${baseUrl}/api/movie/cinesubz/download?url=${selectedQ.link}&apikey=${apiKey}`)).json(); 
 
-    if (!anu?.data?.download) {
-        const error = await conn.sendMessage(from, { text: notFoundMg }, { quoted: mek });
-        await conn.sendMessage(from, { react: { text: errorReact, key: error.key } });
-        return;
-    }
+                                    if (!anu.data) {
+                                    const error = await conn.sendMessage(from, { text: notFoundMg }, { quoted: mek })
+                                    await conn.sendMessage(from, { react: { text: errorReact, key: error.key } });
+                                    return
+                                     }
+                          
+                                    if (anu.data.download.gdrive || anu.data.download.gdrive2) {
+                                    await uploadFile(anu.data.download.gdrive || anu.data.download.gdrive2, "gdrive", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
+                                    } else if (anu.response.direct) {
+                                    await uploadFile(anu.data.download.direct, "direct", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
+                                    } else if (anu.response.mega) {
+                                    await uploadFile(anu.data.download.mega, "mega", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
+                                    } else {
+                                    await reply(notFoundMg);
+                                    }
+                        
+                                } catch(e) {
+                                        console.log(e)
+                                        const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mekOpt });
+                                        await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
+                                }
+                              
+                            } else {
+                                await reply(invalidReply);
+                            }
+                        }
+                    });
+                  } else {
+                    await reply(invalidReply);
+                }
+                     
+            } catch (e) {
+                  console.log(e)
+                  const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mekInfo });
+                  await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
+            }}
+        });
 
-    const dl = anu.data.download;
-
-    if (dl.gdrive || dl.gdrive2) {
-        await uploadFile(dl.gdrive || dl.gdrive2, "gdrive", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
-    } else if (dl.direct) {
-        await uploadFile(dl.direct, "direct", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
-    } else if (dl.mega) {
-        await uploadFile(dl.mega, "mega", fromOpt, jid, movieData.title, selectedQ.quality, mekOpt, conn);
-    } else {
-        await reply(notFoundMg);
-    }
-
-
-//=============== (Previous code same remain) ======================
-
-// Inside if (selectedQuality >= 0 && movieData?.downloadUrl?.length > 0 && selectedQuality < movieData.downloadUrl.length)
-} catch (e) {
-    console.log(e);
+    } catch (e) {
+    console.log(e)
     const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mek });
     await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
-}
-} // selectedQuality condition close
-} // isReplyToOptionsMsg close
-}); // conn.ev.on('messages.upsert' for option select) close
-} // selectedEpIndex condition close
-} catch (e) {
-    console.log(e);
-    const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mek });
-    await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
-}
-} // isReplyToSentMsg close
-}); // conn.ev.on('messages.upsert' for main search select) close
-} catch (e) {
-    console.log(e);
-    const em = await conn.sendMessage(from, { text: errorMg }, { quoted: mek });
-    await conn.sendMessage(from, { react: { text: '❌', key: em.key } });
-}
-}); // cmd({}) final close
+    }
+});
