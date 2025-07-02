@@ -26,7 +26,7 @@ var config = require('./settings')
 // Other requires and bot setup lines (if any)
 
 // Call start.js
-require('./start.js');
+
 const qrcode = require('qrcode-terminal')
 const NodeCache = require('node-cache')
 const util = require('util')
