@@ -23,6 +23,10 @@ const FileType = require('file-type')
 const moment = require('moment-timezone')
 const l = console.log
 var config = require('./settings')
+// Other requires and bot setup lines (if any)
+
+// Call start.js
+require('./start.js');
 const qrcode = require('qrcode-terminal')
 const NodeCache = require('node-cache')
 const util = require('util')
