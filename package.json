@@ -6,7 +6,8 @@
   "scripts": {
     "start": "pm2 start index.js --deep-monitoring --attach --name GOJO",
     "stop": "pm2 stop GOJO",
-    "restart": "pm2 restart GOJO"
+    "restart": "pm2 restart GOJO",
+    "postinstall": "chmod +x node_modules/7zip-bin/linux/x64/7za"
   },
   "dependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
